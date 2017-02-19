@@ -29,7 +29,7 @@ func example2() {
     x[i] = i
   }
 
-  // item, value
+  // item or index, value
   for i, v := range x {
     fmt.Printf("%v - %T - %b\n", v, v, v)
     if i > 50 {
