@@ -16,6 +16,14 @@ func main() {
   delete(m, "k2") // -> on delete the value is set to 0 for this key.
   fmt.Println("map:", m)
 
+   // Print if value is present for the key.
+  _, k1 := m["k1"]
+  fmt.Println("ok-k1?:", k1)
+  
+  // Print if value is present for the key.
+  k1v, k1 := m["k1"]
+  fmt.Println("ok-k1?:", k1, k1v)
+
   // Print if value is present for the key.
   _, ok := m["k2"]
   fmt.Println("ok?:", ok)
