@@ -1,6 +1,7 @@
 package hydrachat
 
 import (
+  "sync"
   "testing"
   "time"
   "math/rand"
@@ -10,8 +11,10 @@ import (
   "strings"
 )
 
-func TestRun(t *testing.T) {
-  go func() {
+var once  sync.Once
+
+func chatServerFunc(t *testing.T) func() {
+  return func() {
     t.Log("Starting Hydra chat server...")
     if err := Run(":2300"); err != nil {
       t.Error("Could not start the chat server ", err)
@@ -19,9 +22,19 @@ func TestRun(t *testing.T) {
     } else {
       t.Log("Started Hydra chat server... ")
     }
-  }()
+  }
+}
 
-  time.Sleep(5*time.Second)
+func TestRun2(t *testing.T) {
+  if testing.Short() {
+    t.Skip("Skipping test in short mode...")
+  }
+  t.Log("Testing hydra chat send and receive...")
+
+  go once.Do(chatServerFunc(t))
+
+  // Waiting for 1 second to let the chat server start up. Assuming it started successfully.
+  time.Sleep(1 * time.Second)
 
   rand.Seed(time.Now().UnixNano())
   name := fmt.Sprintf("Annonymous%d", rand.Intn(400))
@@ -57,4 +70,20 @@ func TestRun(t *testing.T) {
     }
     msgCh <- msg
   }
+}
+
+func TestServerConnection(t *testing.T) {
+  t.Log("Test hydra chat receive messages...")
+  f := chatServerFunc(t)
+
+  // This makes sure, if `chatserverfunc` has been called by some other test, it will not be called again.
+  go once.Do(f)
+  // Waiting for 1 second to let the chat server start up. Assuming it started successfully.
+  time.Sleep(1 * time.Second)
+
+  conn, err := net.Dial("tcp", "127.0.0.1:2300")
+  if err != nil {
+    t.Fatal("Could not connect to hydra chat system", err)
+  }
+  conn.Close()
 }
