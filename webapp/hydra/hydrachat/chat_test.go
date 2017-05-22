@@ -11,6 +11,9 @@ import (
 )
 
 func TestRun(t *testing.T) {
+  if testing.Short() {
+    t.Skip("Skipping test in short mode...")
+  }
   go func() {
     t.Log("Starting Hydra chat server...")
     if err := Run(":2300"); err != nil {
