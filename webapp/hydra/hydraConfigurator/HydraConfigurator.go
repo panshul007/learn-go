@@ -8,6 +8,7 @@ import (
 
 const (
   CUSTOM uint8 = iota
+  JSON
 )
 
 var wrongTypeError error = errors.New("Type must be a pointer to a struct")
@@ -29,6 +30,8 @@ func GetConfiguration(confType uint8, obj interface{}, filename string) (err err
   case CUSTOM:
     fmt.Println("Marshalling the config file: ", filename)
     err = MarshalCustomConfig(mysRValue, filename)
+  case JSON:
+    err = decodeJSONConfig(obj, filename)
   }
   return err
 }
